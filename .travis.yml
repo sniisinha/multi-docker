@@ -9,14 +9,26 @@ script:
   - docker run -e CI=true sni/react-test npm test 
 
 after_success:
-  - docker build -t sni/multi-client ./client
-  - docker build -t sni/multi-nginx ./nginx
-  - docker build -t sni/multi-server ./server
-  - docker build -t sni/multi-worker ./worker
+  - docker build -t snisinha/multi-client ./client
+  - docker build -t snisinha/multi-nginx ./nginx
+  - docker build -t snisinha/multi-server ./server
+  - docker build -t snisinha/multi-worker ./worker
   # login to Dokcer CLI
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   # take build images and push to DockerHub
-  - docker push sni/multi-client
-  - docker push sni/multi-mginx
-  - docker push sni/multi-server
-  - docker push sni/multi-worker
+  - docker push snisinha/multi-client
+  - docker push snisinha/multi-mginx
+  - docker push snisinha/multi-server
+  - docker push snisinha/multi-worker
+
+deploy:
+  provide: elasticbeanstalk
+  region: 'eu-north-1'
+  app: 'multi-docker'
+  env: 'Multi-docker-env'
+  bucket_name: 'elasticbeanstalk-eu-north-1-215410301752'
+  bucket_path : 'docker-multi'
+  on:
+    branch: master
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_KEY
